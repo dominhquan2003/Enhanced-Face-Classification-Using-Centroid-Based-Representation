@@ -1,11 +1,15 @@
-import { View, Text, TouchableOpacity, FlatList, ScrollView } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import { View, Text, TouchableOpacity, FlatList } from 'react-native';
+import React, { useState, useEffect } from 'react';
 import styles from './style';
 
+// Khai báo kiểu cho props
+interface TaskProps {
+  refreshTrigger: number;
+}
 
-const Task = () => {
-  const [tasks, setTasks] = useState([]);
-  
+const Task = ({ refreshTrigger }: TaskProps) => {
+  const [tasks, setTasks] = useState<any[]>([]);
+
   const fetchTasks = () => {
     fetch('http://10.66.2.113:8000/facedetect/api/v1/', {
       method: 'GET',
@@ -28,14 +32,15 @@ const Task = () => {
         console.error('Error:', error);
       });
   };
+
   useEffect(() => {
     fetchTasks();
-  }, []);
+  }, [refreshTrigger]); // fetch lại mỗi khi refreshTrigger thay đổi
 
   type ItemProps = {
-    item: { id: number, name: string },
-    index: number
-  }
+    item: { id: number, name: string };
+    index: number;
+  };
 
   const renderItem = ({ item, index }: ItemProps) => (
     <TouchableOpacity>
@@ -47,11 +52,12 @@ const Task = () => {
       </View>
     </TouchableOpacity>
   );
+
   if (tasks.length === 0) {
     return <Text>No Performers available</Text>;
   }
+
   return (
-    
     <FlatList
       data={tasks}
       renderItem={renderItem}
@@ -59,4 +65,5 @@ const Task = () => {
     />
   );
 };
+
 export default Task;

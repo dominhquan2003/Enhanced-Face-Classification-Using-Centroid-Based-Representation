@@ -1,19 +1,29 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
+import { Text, View } from 'react-native';
 import Task from './components/Task';
 import styles from './App.component.style';
 import Form from './components/Form/index';
+import React, { useState } from 'react';
+
 export default function App() {
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const handlePostSuccess = () => {
+    setRefreshTrigger(prev => prev + 1); 
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.body}>
-        <Text style={styles.header}>List of Performers </Text>
-          <Task/>   
+        <Text style={styles.header}>List of Performers</Text>
+        
+        <Task refreshTrigger={refreshTrigger} />
       </View>
-      <Form />
+      
+      {/* Truyền handlePostSuccess xuống Form để cập nhật Task */}
+      <Form onPostSuccess={handlePostSuccess} />
 
       <StatusBar style="auto" />
     </View>
   );
 }
-
