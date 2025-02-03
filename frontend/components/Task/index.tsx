@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import styles from './style';
 
@@ -7,9 +7,8 @@ const Task = () => {
   const [tasks, setTasks] = useState([]);
   
   const fetchTasks = () => {
-    fetch('http://10.0.2.2:8000/facedetect/api/v1/', {
+    fetch('http://10.66.2.113:8000/facedetect/api/v1/', {
       method: 'GET',
-
       headers: {
         'Content-Type': 'application/json',
         "Access-Control-Allow-Origin": "*",
@@ -52,14 +51,12 @@ const Task = () => {
     return <Text>No Performers available</Text>;
   }
   return (
+    
     <FlatList
       data={tasks}
       renderItem={renderItem}
-      keyExtractor={(_, index) => index.toString()}
+      keyExtractor={(item, index) => index.toString()}
     />
   );
-
-
 };
-
 export default Task;

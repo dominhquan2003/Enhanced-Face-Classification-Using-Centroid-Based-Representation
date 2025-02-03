@@ -8,9 +8,7 @@ export default function App() {
     <View style={styles.container}>
       <View style={styles.body}>
         <Text style={styles.header}>List of Performers </Text>
-        <ScrollView style={styles.items}>
           <Task/>   
-        </ScrollView>
       </View>
       <Form />
 
