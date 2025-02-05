@@ -9,9 +9,9 @@ interface TaskProps {
 
 const Task = ({ refreshTrigger }: TaskProps) => {
   const [tasks, setTasks] = useState<any[]>([]);
-
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
   const fetchTasks = () => {
-    fetch('http://10.66.2.113:8000/facedetect/api/v1/', {
+    fetch(apiUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

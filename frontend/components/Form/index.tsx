@@ -29,7 +29,8 @@ const Form = ({ onPostSuccess }: FormProps) => {
     };
 
     try {
-      const response = await fetch('http://10.66.2.113:8000/facedetect/api/v1/', requestOptions);
+      const apiUrl = process.env.EXPO_PUBLIC_API_URL
+      const response = await fetch(apiUrl, requestOptions);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
