@@ -8,6 +8,7 @@
         }
       ]
     ],
+    "scheme": "face-detect-app",
     "name": "face-detect-app",
     "slug": "face-detect-app",
     "version": "1.0.0",
