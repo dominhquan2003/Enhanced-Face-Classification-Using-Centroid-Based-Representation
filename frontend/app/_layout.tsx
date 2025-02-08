@@ -1,24 +1,38 @@
 import React from 'react';
-import { Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import color from '../contains/color';
-
+import { TouchableOpacity,View } from 'react-native';
+import Feather from '@expo/vector-icons/Feather';
+import styles from './App.component.style';
 const Layout = () => {
   return (
-    <Stack>
+    <Stack
+      screenOptions={{
+        headerTitleStyle: {
+          fontWeight: 'bold',
+          color: color.primary,
+        },
+      }}
+    >
       <Stack.Screen
-        name="index" // Đường dẫn cho HomeScreen
+        name="index"
         options={{
-          title: 'List of Performers',
-          headerTintColor: color.primary,
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
+          title: 'LIST OF PERFORMERS',
+          headerRight: () => (
+            <TouchableOpacity onPress={() => router.push('/add-performer')}>
+              <View style={{ paddingVertical: 12 }}>
+              <Feather name="user-plus" style={styles.icon} />
+              </View>
+            </TouchableOpacity>
+          ),
         }}
+
       />
       <Stack.Screen
-        name="add-performer"
+        name="add-performer"   
         options={{
           title: 'Add Performer',
+
         }}
       />
     </Stack>

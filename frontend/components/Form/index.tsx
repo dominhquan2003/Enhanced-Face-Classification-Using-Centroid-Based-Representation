@@ -1,72 +1,60 @@
 import { View, Text, TextInput, Alert, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import styles from './style';
 import React, { useState } from 'react';
+import AntDesign from '@expo/vector-icons/AntDesign';
+import { ImageHandler } from './imageHandler';
+import { handlePost } from './handlePost';
 
-// Thêm kiểu cho prop
-interface FormProps {
-  onPostSuccess: () => void;
-}
 
-const Form = ({ onPostSuccess }: FormProps) => {
+
+const Form = () => {
   const [performerName, setPerformerName] = useState('');
-
-  const handlePost = async () => {
-    const requestOptions = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        "Access-Control-Allow-Origin": "*",
-      },
-      body: JSON.stringify({
-        name: performerName,
-        status: true,
-        original_image: null,
-        detected_image: null,
-        heatmap_1: null,
-        heatmap_2: null,
-        heatmap_3: null
-      }),
-    };
-
-    try {
-      const apiUrl = process.env.EXPO_PUBLIC_API_URL
-      const response = await fetch(apiUrl, requestOptions);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      console.log('Success:', data);
-      Alert.alert('Success', 'Performance added successfully!');
-      setPerformerName('');
-      
-      // Gọi callback để thông báo về việc post thành công
-      onPostSuccess(); 
-    } catch (error) {
-      console.error('Error:', error);
-    }
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const handleImageUpload = async () => {
+    await ImageHandler.handleUploadImage(setSelectedImage);
+  }
+  const onPostSuccess = () => {
+    // Logic sau khi post thành công
+    setPerformerName('');
   };
 
+  const submitHandler = () => {
+    handlePost(performerName, onPostSuccess);
+  };
+  
   return (
-    <View>
-      
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? 'padding' : 'height'}
-        style={styles.addTag}
-        keyboardVerticalOffset={10}
-      >
-        <TextInput
-          style={styles.input}
-          placeholder="Name of performer"
-          value={performerName}
-          onChangeText={setPerformerName}
-        />
-        <TouchableOpacity onPress={handlePost}>
-          <View style={styles.iconWrapper}>
-            <Text style={styles.icon}>+</Text>
-          </View>
+    <View style={styles.container}>
+      <View style={styles.body}>
+        <TouchableOpacity style={styles.bodyWrapper} onPress={handleImageUpload}>
+          <AntDesign name="camera" style={styles.addTag} />
         </TouchableOpacity>
-      </KeyboardAvoidingView>
+      
+      </View>
+      <View >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? 'padding' : 'height'}
+          style={styles.addTagForm}
+          keyboardVerticalOffset={10}
+        >
+          <TextInput
+            style={styles.input}
+            placeholder="Name of performer"
+            value={performerName}
+            onChangeText={setPerformerName}
+          />
+          <TouchableOpacity onPress={submitHandler}>
+            <View style={styles.postWrapper}>
+              <AntDesign name="arrowup" style={styles.post} />
+
+            </View>
+          </TouchableOpacity>
+        </KeyboardAvoidingView>
+      </View>
+
+
     </View>
+
+
   );
 };
 
