@@ -1,7 +1,12 @@
 import { router } from "expo-router";
 import { Alert } from "react-native";
-
-export const handlePost = async (performerName: string, selectedImage: string | null, onPostSuccess: any) => {
+import { useTaskContext } from '../../context/TaskContext';
+export const handlePost = async (
+  performerName: string,
+  selectedImage: string | null,
+  onPostSuccess: any,
+  addTask: (newTask: { id: number; name: string }) => void
+) => {
   try {
     const apiUrl = process.env.EXPO_PUBLIC_API_URL;
     const formData = new FormData();
@@ -30,8 +35,10 @@ export const handlePost = async (performerName: string, selectedImage: string | 
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
+    useTaskContext
     console.log('Success:', data);
     Alert.alert('Success', 'Performance added successfully!');
+    addTask({ id: data.id, name: performerName });
     onPostSuccess();
     router.push(`/performer/${data.id}`);
   } catch (error) {

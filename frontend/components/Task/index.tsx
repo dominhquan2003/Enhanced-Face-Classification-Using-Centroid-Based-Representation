@@ -1,20 +1,11 @@
 import { View, Text, TouchableOpacity, FlatList } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import styles from './task.style';
-import { useRouter } from 'expo-router';
-import { fetchTasks } from './getTask';
+import { router } from 'expo-router';
+import { useTaskContext } from '../../context/TaskContext';
 
 const Task = () => {
-  const router = useRouter();
-  const [tasks, setTasks] = useState<any[]>([]);
-  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
-  useEffect(() => {
-    const getTasks = async () => {
-      const data = await fetchTasks(apiUrl);
-      setTasks(data);
-    };
-    getTasks();
-  },[]); 
+  const { tasks } = useTaskContext();
   type ItemProps = {
     item: { id: number, name: string };
     index: number;

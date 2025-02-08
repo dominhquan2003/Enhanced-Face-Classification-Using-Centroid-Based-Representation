@@ -4,12 +4,13 @@ import React, { useState } from 'react';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { ImageHandler } from './imageHandler';
 import { handlePost } from './handlePost';
-
+import { useTaskContext } from '../../context/TaskContext'; // Import hook
 
 
 const Form = () => {
   const [performerName, setPerformerName] = useState('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const { addTask } = useTaskContext(); 
   const handleImageUpload = async () => {
     await ImageHandler.handleUploadImage(setSelectedImage);
   }
@@ -19,7 +20,14 @@ const Form = () => {
   };
 
   const submitHandler = () => {
-    handlePost(performerName, selectedImage, onPostSuccess);
+    if (performerName.trim() === "") {
+      Alert.alert("Error", "Please provide a performer name.");
+      return;
+    } else if (!selectedImage) {
+      Alert.alert("Error", "Please provide an image.");
+      return;
+    }
+    handlePost(performerName, selectedImage, onPostSuccess,addTask);
   };
   const removeImage = () => {
     setSelectedImage(null); // Reset selected image
@@ -28,7 +36,7 @@ const Form = () => {
     <View style={styles.container}>
       <View style={styles.body}>
         <TouchableOpacity style={styles.bodyWrapper} onPress={handleImageUpload}>
-         
+
           {selectedImage && (
             <Image
               source={{ uri: selectedImage }}

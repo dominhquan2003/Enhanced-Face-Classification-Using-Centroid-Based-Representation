@@ -5,8 +5,6 @@ import Task from '../components/Task';
 import styles from '../app/App.component.style';
 
 export default function HomeScreen() {
-
-
   return (
     <View style={styles.container}>
       <View style={styles.body}>
