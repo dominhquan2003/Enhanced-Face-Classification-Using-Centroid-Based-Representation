@@ -1,4 +1,4 @@
-import { View, Text, TextInput, Alert, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, Alert, TouchableOpacity, KeyboardAvoidingView, Platform, Image } from 'react-native';
 import styles from './style';
 import React, { useState } from 'react';
 import AntDesign from '@expo/vector-icons/AntDesign';
@@ -14,21 +14,36 @@ const Form = () => {
     await ImageHandler.handleUploadImage(setSelectedImage);
   }
   const onPostSuccess = () => {
-    // Logic sau khi post thành công
     setPerformerName('');
+    setSelectedImage(null);
   };
 
   const submitHandler = () => {
-    handlePost(performerName, onPostSuccess);
+    handlePost(performerName, selectedImage, onPostSuccess);
   };
-  
+  const removeImage = () => {
+    setSelectedImage(null); // Reset selected image
+  };
   return (
     <View style={styles.container}>
       <View style={styles.body}>
         <TouchableOpacity style={styles.bodyWrapper} onPress={handleImageUpload}>
+         
+          {selectedImage && (
+            <Image
+              source={{ uri: selectedImage }}
+              style={styles.imagePreview} // Style for the image
+            />
+          )}
           <AntDesign name="camera" style={styles.addTag} />
+          {selectedImage && (
+            <TouchableOpacity style={styles.removeIcon} onPress={removeImage}>
+              <AntDesign name="close" style={styles.iconClose} />
+            </TouchableOpacity>
+          )}
+
         </TouchableOpacity>
-      
+
       </View>
       <View >
         <KeyboardAvoidingView

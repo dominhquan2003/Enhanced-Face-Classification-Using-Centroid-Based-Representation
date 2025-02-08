@@ -17,18 +17,6 @@ export class ImageHandler {
     const result = await this.pickImage();
     if (result && !result.canceled && result.assets && result.assets.length > 0) {
       setSelectedImage(result.assets[0].uri);
-      Alert.alert(
-        "Are you sure?",
-        "Do you want to use this image?",
-        [
-          {
-            text: "Cancel",
-            onPress: () => setSelectedImage(null),
-            style: "cancel"
-          },
-          { text: "OK" }
-        ]
-      );
     }
   }
 }

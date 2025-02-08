@@ -90,5 +90,32 @@ const styles = StyleSheet.create({
             marginLeft: 10,
             zIndex: 1,
       },
+      imageContainer: {
+            position: 'relative', 
+            width: '100%', 
+            height: '100%', 
+            overflow: 'hidden', 
+      },
+      imagePreview: {
+            position: 'absolute', 
+            width: '100%', 
+            height: '100%',
+            borderRadius: 20,
+            resizeMode: 'cover', 
+            zIndex: 1,
+      },
+      removeIcon: {
+            position: 'absolute',
+            top: 5, 
+            right: 5,
+            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+            borderRadius: 15, 
+            padding: 5,
+            zIndex:2,
+      },
+      iconClose: {
+            fontSize: 20,
+            color: 'red', 
+      },
 });
 export default styles;
