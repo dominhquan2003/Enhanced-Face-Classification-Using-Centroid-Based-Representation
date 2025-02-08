@@ -10,7 +10,6 @@ export const handlePost = async (performerName: string, selectedImage: string | 
     if (selectedImage) {
       const fileName = selectedImage.split('/').pop();
       const fileType = fileName?.split('.').pop();
-
       formData.append('original_image', {
         uri: selectedImage,
         name: fileName,
@@ -26,9 +25,15 @@ export const handlePost = async (performerName: string, selectedImage: string | 
       },
       body: formData,
     };
+    const response = await fetch(apiUrl, requestOptions);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    console.log('Success:', data);
     Alert.alert('Success', 'Performance added successfully!');
     onPostSuccess();
-    router.push('/');
+    router.push(`/performer/${data.id}`);
   } catch (error) {
     console.error('Error:', error);
     Alert.alert('Error', 'Failed to add performer.');
