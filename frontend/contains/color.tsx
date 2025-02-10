@@ -7,5 +7,6 @@ export default {
       badge1: "#2E5077",
       badge2: "#4DA1A9",
       grey: "#b9bbbd",
+      red: "#A94A4A",
       
 }

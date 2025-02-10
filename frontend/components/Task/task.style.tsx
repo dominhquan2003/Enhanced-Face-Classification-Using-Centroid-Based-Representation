@@ -35,9 +35,10 @@ const styles = StyleSheet.create({
             fontWeight: '700',
       },
       content: {
-            width: '80%',
-            fontSize: 17,
+            width: '76%',
+            fontSize: 16,
             color: color.text,
+            marginLeft: 10,
       },
       squareOdd: {
             backgroundColor: color.badge1,
@@ -45,5 +46,9 @@ const styles = StyleSheet.create({
       squareEven: {
             backgroundColor: color.badge2,
       },
+      iconTrash: {
+            fontSize: 24,
+            color: color.red,
+      }
 });
 export default styles;
