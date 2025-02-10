@@ -5,4 +5,4 @@ Make changes in your models (models.py).
 Run the command python manage.py makemigrations or python3 manage.py makemigrations
 Then run the command python manage.py migrate.
 ### Reset 
-manage.py flush
+python manage.py flush
