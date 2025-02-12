@@ -27,17 +27,4 @@ else
     exit 1
 fi
 
-# Dừng quy trình đang chạy trên cổng 8081
-PID=$(netstat -ano | findstr :8081 | awk '{print $5}')
-
-if [ -n "$PID" ]; then
-    echo "Dừng quy trình đang chạy trên cổng 8081 với PID $PID..."
-    taskkill /PID $PID /F
-fi
-
-# Khởi động server React Native
-echo "Khởi động server React Native..."
-cd ../frontend
-npm run android &
-
-echo "Quá trình hoàn tất. Bạn có thể kiểm tra tại http://$IP:8000/facedetect/api/v1/."
+echo "Backend đã khởi động thành công."
