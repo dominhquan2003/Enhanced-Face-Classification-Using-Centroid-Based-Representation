@@ -10,10 +10,10 @@ class ImageProcessor:
     def detect_and_crop_face(image):
         face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        faces = face_cascade.detectMultiScale(gray, 1.1, 4)
+        faces = face_cascade.detectMultiScale(gray, 1.1, 3)
         detected_faces = []
         for (x, y, w, h) in faces:
-            cv2.rectangle(image, (x, y), (x+w, y+h), (255, 0, 0), 2) 
+            cv2.rectangle(image, (x, y), (x+w, y+h), (255, 0, 0), 1) 
             side_length = max(w, h)  
             half_side = side_length // 2
             center_x = x + w // 2
@@ -26,7 +26,6 @@ class ImageProcessor:
             
             face_img = image[y1:y2, x1:x2]
             detected_faces.append(face_img)  
-
         return detected_faces  
    
     def preprocess_image(self, img_path):

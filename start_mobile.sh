@@ -1,11 +1,13 @@
 #!/bin/bash
 
 # Dừng quy trình đang chạy trên cổng 8081
-PID=$(netstat -ano | findstr :8081 | awk '{print $5}')
+PIDS=$(netstat -ano | findstr :8081 | awk '{print $5}')
 
-if [ -n "$PID" ]; then
-    echo "Dừng quy trình đang chạy trên cổng 8081 với PID $PID..."
-    taskkill /PID $PID /F
+if [ -n "$PIDS" ]; then
+    echo "Dừng quy trình đang chạy trên cổng 8081 với PID $PIDS..."
+    for PID in $PIDS; do
+        taskkill //PID $PID //F
+    done
 fi
 
 # Khởi động server React Native

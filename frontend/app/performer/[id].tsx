@@ -57,7 +57,7 @@ const PerformerDetail = () => {
         <TouchableOpacity onPress={() => openModal(performer.detected_image)}>
           <View style={styles.imageContainer}>
             <Image source={{ uri: performer.detected_image }} style={styles.imageLarge} />
-            <Text style={styles.label}>Detected Image</Text>
+            <Text style={styles.label}>Input Image heat map</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -66,19 +66,19 @@ const PerformerDetail = () => {
         <TouchableOpacity onPress={() => openModal(performer.heatmap_1)}>
           <View style={styles.imageContainer}>
             <Image source={{ uri: performer.heatmap_1 }} style={styles.imageSmall} />
-            <Text style={styles.label}>Heatmap 1</Text>
+            <Text style={styles.label}>Predict Actor 1</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => openModal(performer.heatmap_2)}>
           <View style={styles.imageContainer}>
             <Image source={{ uri: performer.heatmap_2 }} style={styles.imageSmall} />
-            <Text style={styles.label}>Heatmap 2</Text>
+            <Text style={styles.label}>Predict Actor 2</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => openModal(performer.heatmap_3)}>
           <View style={styles.imageContainer}>
             <Image source={{ uri: performer.heatmap_3 }} style={styles.imageSmall} />
-            <Text style={styles.label}>Heatmap 3</Text>
+            <Text style={styles.label}>Predict Actor 3</Text>
           </View>
         </TouchableOpacity>
       </View>
