@@ -4,7 +4,9 @@ import os
 
 
 def sanitize_filename(filename):
-    return re.sub(r'[^\w-]', '_', filename)
+    filename = re.sub(r'[^\w-]', '_', filename)  # Thay thế ký tự không hợp lệ
+    filename = filename.replace(" ", "_")  # Thay thế khoảng trắng bằng dấu gạch dưới
+    return filename
 
 def get_upload_path(instance, filename):
     person_name = sanitize_filename(instance.name)  # Sử dụng name từ mô hình này

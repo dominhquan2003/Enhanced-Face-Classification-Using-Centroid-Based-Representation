@@ -10,5 +10,5 @@ exporter = PythonExporter()
 py_content, _ = exporter.from_notebook_node(notebook_content)
 
 # Ghi ra file .py
-with open('d:/TailieuhocTDTu/ProjectInformationTechnology/reactnative_mobileapp/backendapi/api/predict.py', 'w', encoding='utf-8') as f:
+with open('d:/TailieuhocTDTu/ProjectInformationTechnology/reactnative_mobileapp/backendapi/api/predicttest.py', 'w', encoding='utf-8') as f:
     f.write(py_content)

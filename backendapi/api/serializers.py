@@ -15,6 +15,6 @@ class PerformerSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # Nếu không có status, gán giá trị mặc định là 'True'
         if 'status' not in validated_data or validated_data['status'] is None:
-            validated_data['status'] = 'True'
+            validated_data['status'] = True
         
         return super().create(validated_data)

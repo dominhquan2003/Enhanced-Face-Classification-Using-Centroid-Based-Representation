@@ -1,21 +1,13 @@
-import numpy as np
+import tensorflow as tf
 from .image_processor import ImageProcessor
-
-
 class FeatureExtractor:
-    def __init__(self, model_loader):
-        self.feature_extractor = model_loader.feature_extractor
-        self.pca_model = model_loader.pca_model
-        self.all_centroids = model_loader.all_centroids
-
+    def __init__(self, base_model, pca_model,img_size=(224, 224)):
+        self.feature_extractor = tf.keras.Model(inputs=base_model.input, outputs=base_model.get_layer('conv5_block3_out').output)
+        self.pca_model = pca_model
+        self.image_processor = ImageProcessor(img_size)
     def extract_feature_map(self, img_path):
-        img_array = ImageProcessor.preprocess_image(img_path)
+        img_array, _ = self.image_processor.preprocess_image(img_path)
         feature_maps = self.feature_extractor.predict(img_array)
         feature_vector = feature_maps.reshape(1, -1)
-        feature_vector_reduced = self.pca_model.transform(feature_vector)
-        return feature_vector_reduced
-
-    def compute_distance_vector(self, img_path):
-        feature_vector_reduced = self.extract_feature_map(img_path)
-        distances = np.linalg.norm(self.all_centroids - feature_vector_reduced, axis=1)
-        return distances.reshape(1, -1)
+        return self.pca_model.transform(feature_vector)
+    
