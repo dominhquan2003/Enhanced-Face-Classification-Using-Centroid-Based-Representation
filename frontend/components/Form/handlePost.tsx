@@ -5,13 +5,15 @@ export const handlePost = async (
   performerName: string,
   selectedImage: string | null,
   onPostSuccess: any,
-  addTask: (newTask: { id: number; name: string }) => void
+  addTask: (newTask: { id: number; name: string }) => void, 
+  kmeans_k: string
 ) => {
   try {
     const apiUrl = process.env.EXPO_PUBLIC_API_URL;
     const formData = new FormData();
     formData.append('name', performerName);
     formData.append('status', 'true');
+    formData.append('kmeans_k', kmeans_k);
     if (selectedImage) {
       const fileName = selectedImage.split('/').pop();
       const fileType = fileName?.split('.').pop();

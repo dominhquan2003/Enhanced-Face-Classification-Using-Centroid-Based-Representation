@@ -19,12 +19,17 @@ NUM_PEOPLE = 488
 base_model = load_model('models/resnet50.h5')
 feature_extractor = tf.keras.Model(inputs=base_model.input, outputs=base_model.get_layer('conv5_block3_out').output)
 
-pca_model = joblib.load('models/kmeans_k=16/pca_model.pkl')
-kmeans_models = [joblib.load(path) for path in glob.glob('models/kmeans_k=16/kmeans_label_*.pkl')]
-all_centroids = np.concatenate([model.cluster_centers_ for model in kmeans_models], axis=0)
-
 with open("models/feature_maps/class_indices.json", "r") as f:
     index_to_class = {v: k for k, v in json.load(f).items()}
+
+def load_models(kmeans_version):
+    pca_model = joblib.load(f'models/kmeans_k={kmeans_version}/pca_model.pkl')
+    kmeans_models = [
+        joblib.load(path) for path in glob.glob(f'models/kmeans_k={kmeans_version}/kmeans_label_*.pkl')
+    ]
+    all_centroids = np.concatenate([model.cluster_centers_ for model in kmeans_models], axis=0)
+    
+    return pca_model, kmeans_models, all_centroids
 
 def detect_and_crop_face(image):
         face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
@@ -64,18 +69,38 @@ def preprocess_image(img_path):
         img_array = image.img_to_array(face_img)
         return preprocess_input(np.expand_dims(img_array, axis=0)), face_img
 
-def extract_feature_map(img_path):
+def extract_feature_map(img_path, pca_model):
     img_array, _ = preprocess_image(img_path)
     feature_maps = feature_extractor.predict(img_array)
     feature_vector = feature_maps.reshape(1, -1)
     return pca_model.transform(feature_vector)
 
-def find_closest_people(img_path, num_people=3):
-    feature_vector_reduced = extract_feature_map(img_path)
+def find_closest_people(img_path, num_people=3, kmeans_version=16, pca_model=None, all_centroids=None):
+    feature_vector_reduced = extract_feature_map(img_path, pca_model)
     distances = np.linalg.norm(all_centroids - feature_vector_reduced, axis=1)
-    closest_centroids = np.argsort(distances)[:num_people * NUM_CENTROIDS_PER_PERSON]
-    closest_people = set(closest_centroids // NUM_CENTROIDS_PER_PERSON)
+    closest_centroids = np.argsort(distances)[:num_people * kmeans_version]
+    closest_people = set(closest_centroids // kmeans_version)
     return [index_to_class.get(person, "Unknown") for person in list(closest_people)[:num_people]]
+
+def visualize_heatmaps(img_path, kmeans_version):
+    # Tải mô hình tương ứng với kmeans_version
+    pca_model, kmeans_models, all_centroids = load_models(kmeans_version)
+
+    predicted_people = find_closest_people(img_path, num_people=3, kmeans_version=kmeans_version, pca_model=pca_model, all_centroids=all_centroids)
+    predicted_images = load_predicted_people_images(predicted_people)
+    
+    input_array, input_img = preprocess_image(img_path)
+    input_heatmap_img = overlay_heatmap(input_img, compute_gradcam(feature_extractor, input_array))
+    
+    # Lưu heatmap đầu vào
+    heatmaps = [input_heatmap_img]
+    for i, (person, img_path) in enumerate(predicted_images.items()):
+        img_array, img = preprocess_image(img_path)
+        heatmap = compute_gradcam(feature_extractor, img_array)
+        heatmap_img = overlay_heatmap(img, heatmap)
+        heatmaps.append(heatmap_img)
+
+    return input_heatmap_img, heatmaps
 
 def load_predicted_people_images(predicted_people, train_dir="models/data"):
     images = {}
@@ -100,21 +125,23 @@ def overlay_heatmap(img, heatmap):
     heatmap = cv2.applyColorMap(cv2.resize((heatmap * 255).astype(np.uint8), (img.shape[1], img.shape[0])), cv2.COLORMAP_JET)
     return cv2.addWeighted(img, 0.5, heatmap, 0.5, 0)
 
-def visualize_heatmaps(img_path):
-        predicted_people = find_closest_people(img_path)
-        predicted_images = load_predicted_people_images(predicted_people)
-        
-        input_array, input_img = preprocess_image(img_path)
-        input_heatmap_img = overlay_heatmap(input_img, compute_gradcam(feature_extractor, input_array))
-        # Lưu heatmap đầu vào
-        heatmaps = [input_heatmap_img]
-        for i, (person, img_path) in enumerate(predicted_images.items()):
-            img_array, img = preprocess_image(img_path)
-            heatmap = compute_gradcam(feature_extractor, img_array)
-            heatmap_img = overlay_heatmap(img, heatmap)
-            heatmaps.append(heatmap_img)
 
-        return input_heatmap_img, heatmaps
+def visualize_heatmaps(img_path, kmeans_version):
+    # Tải mô hình tương ứng với kmeans_version
+    pca_model, kmeans_models, all_centroids = load_models(kmeans_version)
 
+    predicted_people = find_closest_people(img_path, num_people=3, kmeans_version=kmeans_version, pca_model=pca_model, all_centroids=all_centroids)
+    predicted_images = load_predicted_people_images(predicted_people)
+    
+    input_array, input_img = preprocess_image(img_path)
+    input_heatmap_img = overlay_heatmap(input_img, compute_gradcam(feature_extractor, input_array))
+    
+    # Lưu heatmap đầu vào
+    heatmaps = [input_heatmap_img]
+    for i, (person, img_path) in enumerate(predicted_images.items()):
+        img_array, img = preprocess_image(img_path)
+        heatmap = compute_gradcam(feature_extractor, img_array)
+        heatmap_img = overlay_heatmap(img, heatmap)
+        heatmaps.append(heatmap_img)
 
-
+    return input_heatmap_img, heatmaps

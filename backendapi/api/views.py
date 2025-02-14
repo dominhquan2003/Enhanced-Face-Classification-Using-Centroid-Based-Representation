@@ -25,6 +25,7 @@ class PerformerListCreate(generics.ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         original_image = request.FILES.get('original_image')
         name = request.data.get('name')
+        kmeans_k = request.data.get('kmeans_k')  
         if not original_image:
             return Response({'error': 'No image provided'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -46,7 +47,7 @@ class PerformerListCreate(generics.ListCreateAPIView):
             face_crop_path = os.path.join(save_folder, face_crop_name)
             cv2.imwrite(face_crop_path, face_img)
             
-            input_heatmap_img, heatmaps = visualize_heatmaps(face_crop_path)
+            input_heatmap_img, heatmaps = visualize_heatmaps(face_crop_path,int(kmeans_k))
             
             heatmap_input_path = os.path.join(save_folder, f"heatmap_input_{name}_{i}.jpg")
             cv2.imwrite(heatmap_input_path, input_heatmap_img)
@@ -59,9 +60,9 @@ class PerformerListCreate(generics.ListCreateAPIView):
             name=name,
             original_image=original_image,
             detected_image=heatmap_input_path,
-            heatmap_1=heatmap_filenames[0] if len(heatmap_filenames) > 0 else None,
-            heatmap_2=heatmap_filenames[1] if len(heatmap_filenames) > 1 else None,
-            heatmap_3=heatmap_filenames[2] if len(heatmap_filenames) > 2 else None,
+            heatmap_1=heatmap_filenames[1] if len(heatmap_filenames) > 0 else None,
+            heatmap_2=heatmap_filenames[2] if len(heatmap_filenames) > 1 else None,
+            heatmap_3=heatmap_filenames[3] if len(heatmap_filenames) > 2 else None,
         )
 
         serializer = self.get_serializer(performer)

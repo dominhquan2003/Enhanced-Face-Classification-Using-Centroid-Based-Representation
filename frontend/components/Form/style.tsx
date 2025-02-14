@@ -91,31 +91,67 @@ const styles = StyleSheet.create({
             zIndex: 1,
       },
       imageContainer: {
-            position: 'relative', 
-            width: '100%', 
-            height: '100%', 
-            overflow: 'hidden', 
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            overflow: 'hidden',
       },
       imagePreview: {
-            position: 'absolute', 
-            width: '100%', 
+            position: 'absolute',
+            width: '100%',
             height: '100%',
             borderRadius: 20,
-            resizeMode: 'cover', 
+            resizeMode: 'cover',
             zIndex: 1,
       },
       removeIcon: {
             position: 'absolute',
-            top: 5, 
+            top: 5,
             right: 5,
             backgroundColor: 'rgba(255, 255, 255, 0.7)',
-            borderRadius: 15, 
+            borderRadius: 15,
             padding: 5,
-            zIndex:2,
+            zIndex: 2,
       },
       iconClose: {
             fontSize: 20,
-            color: 'red', 
+            color: 'red',
+      },
+
+      dropdownBtn: {
+            marginTop: 10,
+            width: '50%',
+            height: 50,
+            backgroundColor: color.background,
+            borderWidth: 1,
+            borderColor: color.badge2,
+            borderRadius: 8,
+            justifyContent: 'space-between',
+            paddingHorizontal: 10,
+            flexDirection: 'row',
+            alignItems: 'center',
+
+      },
+      dropdown: {
+            backgroundColor: '#FFF',
+            borderRadius: 8,
+            marginTop: 5,
+            elevation: 5,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.2,
+            shadowRadius: 4,
+
+      },
+      rowText: {
+            padding: 10,
+            fontSize: 16,
+            color: '#333',
+
+      },
+      buttonText: {
+            color: "#888", // Màu chữ trắng cho giá trị mặc định
+            fontSize: 16, // Kích thước chữ
       },
 });
 export default styles;
