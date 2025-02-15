@@ -50,14 +50,41 @@ const PerformerDetail = () => {
       <View style={styles.row}>
         <TouchableOpacity onPress={() => openModal(performer.original_image)}>
           <View style={styles.imageContainer}>
-            <Image source={{ uri: performer.original_image }} style={styles.imageLarge} />
+            <Image source={{ uri: performer.original_image }} style={styles.imageSmall} />
             <Text style={styles.label}>Original Image</Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => openModal(performer.detected_image)}>
+        <TouchableOpacity onPress={() => openModal(performer.crop_image)}>
           <View style={styles.imageContainer}>
-            <Image source={{ uri: performer.detected_image }} style={styles.imageLarge} />
-            <Text style={styles.label}>Input Image heat map</Text>
+            <Image source={{ uri: performer.crop_image }} style={styles.imageSmall} />
+            <Text style={styles.label}>Crop Image</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => openModal(performer.crop_heatmap_image)}>
+          <View style={styles.imageContainer}>
+            <Image source={{ uri: performer.crop_heatmap_image }} style={styles.imageSmall} />
+            <Text style={styles.label}> Crop heat map</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.row}>
+        <TouchableOpacity onPress={() => openModal(performer.predictor_1)}>
+          <View style={styles.imageContainer}>
+            <Image source={{ uri: performer.predictor_1 }} style={styles.imageSmall} />
+            <Text style={styles.label}>Predict Actor 1</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => openModal(performer.predictor_2)}>
+          <View style={styles.imageContainer}>
+            <Image source={{ uri: performer.predictor_2 }} style={styles.imageSmall} />
+            <Text style={styles.label}>Predict Actor 2</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => openModal(performer.predictor_3)}>
+          <View style={styles.imageContainer}>
+            <Image source={{ uri: performer.predictor_3 }} style={styles.imageSmall} />
+            <Text style={styles.label}>Predict Actor 3</Text>
           </View>
         </TouchableOpacity>
       </View>

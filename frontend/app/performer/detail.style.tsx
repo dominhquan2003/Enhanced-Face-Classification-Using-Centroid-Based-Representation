@@ -25,6 +25,7 @@ const styles = StyleSheet.create({
     height: width * 0.45,
     borderRadius: 10,
   },
+
   imageSmall: {
     width: width * 0.25,
     height: width * 0.3,

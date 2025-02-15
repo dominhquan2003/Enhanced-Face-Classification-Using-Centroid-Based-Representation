@@ -119,26 +119,23 @@ def overlay_heatmap(img, heatmap):
     return cv2.addWeighted(np.array(img), 0.5, heatmap_colored, 0.5, 0)
 
 def visualize_heatmaps(img_path, cluster='kmeans_k=16'):
-    
     feature_extractor, feature_layer_name, pca_model, all_centroids, index_to_class = load_models_centroids(
-        name_model='MobileNetV2', cluster=cluster
-    )
+        name_model='MobileNetV2', cluster=cluster)
     predicted_people = find_closest_people(img_path, num_people=3, 
                                             feature_extractor=feature_extractor, 
                                             pca_model=pca_model, 
                                             all_centroids=all_centroids, 
                                             index_to_class=index_to_class)
-    
-    
     input_array, input_img = preprocess_image(img_path)
     input_heatmap = overlay_heatmap(input_img, compute_gradcam(feature_extractor, input_array, layer_name=feature_layer_name))
+    predicted_images = [(input_img, input_heatmap)] 
     
-    predicted_images = [input_heatmap] 
     for person in predicted_people:
         img_path = get_image_from_train(person)
         if img_path:
             img_array, img = preprocess_image(img_path)
             person_heatmap = overlay_heatmap(img, compute_gradcam(feature_extractor, img_array, layer_name=feature_layer_name))
-            predicted_images.append(person_heatmap)  
+            
+            predicted_images.append((img, person_heatmap)) 
     
     return predicted_images
