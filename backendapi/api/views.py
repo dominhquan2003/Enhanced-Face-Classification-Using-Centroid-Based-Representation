@@ -9,7 +9,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from .models import Performer
 from .serializers import PerformerSerializer
-from .predict_baseon_centroid import detect_and_crop_face, visualize_heatmaps  # Adjust the import based on your module structure
+from .predict import detect_and_crop_face, visualize_heatmaps  
 import numpy as np
 import cv2
 import os
@@ -18,7 +18,22 @@ def sanitize_filename(filename):
     filename = re.sub(r'[^\w-]', '_', filename)  
     filename = filename.replace(" ", "_")  
     return filename
-
+def save_detected_faces(detected_faces, save_folder, name, kmeans_k):
+    heatmap_filenames = []
+    for i, face_img in enumerate(detected_faces):
+        face_crop_name = f"face_crop_{sanitize_filename(name)}_{i}.jpg"
+        face_crop_path = os.path.join(save_folder, face_crop_name)
+        cv2.imwrite(face_crop_path, face_img)
+        predicted_images = visualize_heatmaps(face_crop_path, kmeans_k)
+        heatmap_input_path = os.path.join(save_folder, f"heatmap_input_{name}_{i}.jpg")
+        cv2.imwrite(heatmap_input_path, predicted_images[0])  # Lưu heatmap đầu vào
+        
+        for j, heatmap in enumerate(predicted_images[1:]):  # Bỏ qua hình ảnh đầu vào
+            heatmap_path = os.path.join(save_folder, f"heatmap_{j+1}_{sanitize_filename(name)}_{i}.jpg")
+            cv2.imwrite(heatmap_path, heatmap)
+            heatmap_filenames.append(heatmap_path)
+    
+    return heatmap_filenames, heatmap_input_path
 class PerformerListCreate(generics.ListCreateAPIView):
     queryset = Performer.objects.all()
     serializer_class = PerformerSerializer
@@ -40,29 +55,15 @@ class PerformerListCreate(generics.ListCreateAPIView):
 
         save_folder = os.path.join('images', name)
         os.makedirs(save_folder, exist_ok=True)
-        heatmap_filenames = []
-
-        for i, face_img in enumerate(detected_faces):
-            face_crop_name = f"face_crop_{sanitize_filename(name)}_{i}.jpg"
-            face_crop_path = os.path.join(save_folder, face_crop_name)
-            cv2.imwrite(face_crop_path, face_img)
-            
-            input_heatmap_img, heatmaps = visualize_heatmaps(face_crop_path,int(kmeans_k))
-            
-            heatmap_input_path = os.path.join(save_folder, f"heatmap_input_{name}_{i}.jpg")
-            cv2.imwrite(heatmap_input_path, input_heatmap_img)
-            for j, heatmap in enumerate(heatmaps):
-                heatmap_path =  os.path.join(save_folder, f"heatmap_{j+1}_{sanitize_filename(name)}_{i}.jpg")
-                cv2.imwrite(heatmap_path, heatmap)
-                heatmap_filenames.append(heatmap_path)
+        heatmap_filenames, heatmap_input_path = save_detected_faces(detected_faces, save_folder, name, kmeans_k)
 
         performer = Performer.objects.create(
             name=name,
             original_image=original_image,
             detected_image=heatmap_input_path,
-            heatmap_1=heatmap_filenames[1] if len(heatmap_filenames) > 0 else None,
-            heatmap_2=heatmap_filenames[2] if len(heatmap_filenames) > 1 else None,
-            heatmap_3=heatmap_filenames[3] if len(heatmap_filenames) > 2 else None,
+            heatmap_1=heatmap_filenames[0] if len(heatmap_filenames) > 0 else None,
+            heatmap_2=heatmap_filenames[1] if len(heatmap_filenames) > 1 else None,
+            heatmap_3=heatmap_filenames[2] if len(heatmap_filenames) > 2 else None,
         )
 
         serializer = self.get_serializer(performer)

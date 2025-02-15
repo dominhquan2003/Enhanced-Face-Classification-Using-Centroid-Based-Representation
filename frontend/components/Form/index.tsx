@@ -55,12 +55,11 @@ const Form = () => {
         </TouchableOpacity>
 
         <SelectDropdown
-          data={['kmeans_k=16', 'kmeans_k=32']}
+          data={['kmeans_k=16', 'kmeans_k=32','gmm_k=16','gmm_k=32']}
           onSelect={(selectedItem, index) => {
-            const kmeansValue = selectedItem.replace('kmeans_k=', '');
-            setKmeansValue(kmeansValue); // Lưu dưới dạng chuỗi
+            setKmeansValue(selectedItem); 
           }}
-          defaultValue={kmeansValue ? `kmeans_k=${kmeansValue}` : "Select KMeans"}// Hiển thị giá trị mặc định
+          defaultValue={kmeansValue ? `kmeans_k=${kmeansValue}` : "Select KMeans"}
           renderButton={(selectedItem, isOpened) => {
             return (
               <TouchableOpacity style={styles.dropdownBtn}>
