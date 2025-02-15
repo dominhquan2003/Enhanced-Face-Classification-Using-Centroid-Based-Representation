@@ -21,7 +21,7 @@ Virtual Device: Android Studio (Pixel_3a_API_30).
 
 # ⚙️ 3. Backend Installation (Django)
 ### Clone project
-git clone https://github.com/your-repo.git
+git clone https://github.com/your-repo.git](https://github.com/dominhquan2003/Enhanced-Face-Classification-Using-Centroid-Based-Representation
 cd backendapi
 
 ### Install libraries
