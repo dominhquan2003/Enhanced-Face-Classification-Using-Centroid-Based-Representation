@@ -9,7 +9,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from .models import Performer
 from .serializers import PerformerSerializer
-from .predict import detect_and_crop_face, visualize_heatmaps  # Adjust the import based on your module structure
+from .predict_baseon_centroid import detect_and_crop_face, visualize_heatmaps  # Adjust the import based on your module structure
 import numpy as np
 import cv2
 import os
