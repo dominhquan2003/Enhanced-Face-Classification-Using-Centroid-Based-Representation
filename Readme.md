@@ -1,4 +1,4 @@
-# 📱🎯 Mobile & Backend Project with Django & React Native Expo
+# 📱🎯 Enhanced Face Classification Using Centroid Based Representation
 
 ## 🌟 1. Introduction
 The project includes:
