@@ -25,6 +25,9 @@ class Performer(models.Model):
     heatmap_1 = models.ImageField(upload_to=get_upload_path,null=True, blank=True)  
     heatmap_2 = models.ImageField(upload_to=get_upload_path,null=True, blank=True)  
     heatmap_3 = models.ImageField(upload_to=get_upload_path,null=True, blank=True)  
+    lg = models.ImageField(upload_to=get_upload_path,null=True, blank=True)  
+    knn = models.ImageField(upload_to=get_upload_path,null=True, blank=True)  
+    mlp = models.ImageField(upload_to=get_upload_path,null=True, blank=True)  
    
     def __str__(self):
         return self.name

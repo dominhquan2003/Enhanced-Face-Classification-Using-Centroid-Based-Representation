@@ -15,6 +15,18 @@ NUM_CENTROIDS_PER_PERSON = 16
 NUM_PEOPLE = 488
 
 
+logreg_model = joblib.load('models/logreg/logreg.pkl')
+logreg_pca = joblib.load('models/logreg/logreg_pca.pkl')
+logreg_scaler = joblib.load('models/logreg/logreg_scaler.pkl')
+
+knn_model = joblib.load('models/knn/knn.pkl')
+knn_pca = joblib.load("models/knn/knn_pca.pkl")
+knn_scaler = joblib.load("models/knn/knn_scaler.pkl")
+
+mlp_model = load_model("models/mlp/mlp.h5")
+mlp_scaler = joblib.load("models/mlp/mlp_scaler.pkl")
+    
+
 def load_models_centroids(name_model:str = 'MobileNetV2', cluster:str = 'kmeans_k=16'):
     # =======================================  CNN models =======================================
     if name_model == 'EfficientNetB0':
@@ -37,10 +49,6 @@ def load_models_centroids(name_model:str = 'MobileNetV2', cluster:str = 'kmeans_
         index_to_class = {v: k for k, v in json.load(f).items()}
 
     return feature_extractor, feature_layer_name, pca_model, all_centroids, index_to_class
-
-
-# feature_extractor, feature_layer_name, pca_model, all_centroids, index_to_class = load_models_centroids(name_model='MobileNetV2', 
-#                                                                                                         cluster='kmeans_k=16')
 
 
 def detect_and_crop_face(image):
@@ -76,12 +84,23 @@ def preprocess_image(img_path):
       img = cv2.resize(img, IMG_SIZE)
       img_array = image.img_to_array(img)
       return preprocess_input(np.expand_dims(img_array, axis=0)), img
+  
+def get_image(img_path):
+      img = cv2.imread(img_path)
+      if img is None:
+            raise ValueError(f"Error: Could not read image {img_path}.")
+      img = cv2.resize(img, IMG_SIZE)
+      return img
 
 def extract_feature_map(img_path, feature_extractor, pca_model):
     img_array, _ = preprocess_image(img_path)
     feature_maps = feature_extractor.predict(img_array)
     feature_vector = feature_maps.reshape(1, -1)
     return pca_model.transform(feature_vector)
+
+def compute_distance_vector(img_path, all_centroids, feature_extractor, pca_model):
+    feature_vector_reduced = extract_feature_map(img_path, feature_extractor, pca_model)
+    return np.linalg.norm(all_centroids - feature_vector_reduced, axis=1).reshape(1, -1)
 
 def find_closest_people(img_path, num_people=3, feature_extractor=None, pca_model=None, all_centroids=None, index_to_class=None):
     feature_vector_reduced = extract_feature_map(img_path, feature_extractor, pca_model)
@@ -106,19 +125,15 @@ def compute_gradcam(model, img_array, layer_name='conv5_block3_out'):
     return heatmap / np.max(heatmap)
 
 def overlay_heatmap(img, heatmap):
-    # Kiểm tra xem img có phải là mảng NumPy không
     if isinstance(img, np.ndarray):
-        height, width = img.shape[:2]  # Lấy chiều cao và chiều rộng từ hình ảnh
+        height, width = img.shape[:2]  
     else:
         raise ValueError("img must be a numpy array")
-
-    # Tạo heatmap với kích thước phù hợp
     heatmap_resized = cv2.resize((heatmap * 255).astype(np.uint8), (width, height))
     heatmap_colored = cv2.applyColorMap(heatmap_resized, cv2.COLORMAP_JET)
-    
     return cv2.addWeighted(np.array(img), 0.5, heatmap_colored, 0.5, 0)
 
-def visualize_heatmaps(img_path, cluster='kmeans_k=16'):
+def visualize_and_predict(img_path, cluster='kmeans_k=16'):
     feature_extractor, feature_layer_name, pca_model, all_centroids, index_to_class = load_models_centroids(
         name_model='MobileNetV2', cluster=cluster)
     predicted_people = find_closest_people(img_path, num_people=3, 
@@ -126,16 +141,77 @@ def visualize_heatmaps(img_path, cluster='kmeans_k=16'):
                                             pca_model=pca_model, 
                                             all_centroids=all_centroids, 
                                             index_to_class=index_to_class)
+
     input_array, input_img = preprocess_image(img_path)
     input_heatmap = overlay_heatmap(input_img, compute_gradcam(feature_extractor, input_array, layer_name=feature_layer_name))
-    predicted_images = [(input_img, input_heatmap)] 
-    
+    predicted_images = [(input_img, input_heatmap)]
     for person in predicted_people:
-        img_path = get_image_from_train(person)
-        if img_path:
-            img_array, img = preprocess_image(img_path)
+        person_img_path = get_image_from_train(person)
+        if person_img_path:
+            img_array, img = preprocess_image(person_img_path)
             person_heatmap = overlay_heatmap(img, compute_gradcam(feature_extractor, img_array, layer_name=feature_layer_name))
-            
-            predicted_images.append((img, person_heatmap)) 
+            predicted_images.append((img, person_heatmap))
+
+    #classification 
+    distance_vector = compute_distance_vector(img_path, all_centroids, feature_extractor, pca_model)
+    knn_pred = knn_model.predict(knn_pca.transform(knn_scaler.transform(distance_vector)))[0]
+    mlp_pred = np.argmax(mlp_model.predict(mlp_scaler.transform(distance_vector)), axis=1)[0]
+    logreg_pred = logreg_model.predict(logreg_pca.transform(logreg_scaler.transform(distance_vector)))[0]
+    predictions = {
+        "LogisticRegression": logreg_pred,
+        "KNN": knn_pred,
+        "MLP": mlp_pred
+    }
+    predicted_labels_images = []
+    for method, pred in predictions.items():
+        pred_img_path = get_image_from_train(index_to_class.get(pred, "Unknown"))
+        if pred_img_path:
+            img = get_image(pred_img_path)
+            predicted_labels_images.append(img)  
+
+    return predicted_images, predicted_labels_images
+
+
+
+# def visualize_heatmaps(img_path, cluster='kmeans_k=16'):
+#     feature_extractor, feature_layer_name, pca_model, all_centroids, index_to_class = load_models_centroids(
+#         name_model='MobileNetV2', cluster=cluster)
+#     predicted_people = find_closest_people(img_path, num_people=3, 
+#                                             feature_extractor=feature_extractor, 
+#                                             pca_model=pca_model, 
+#                                             all_centroids=all_centroids, 
+#                                             index_to_class=index_to_class)
+#     input_array, input_img = preprocess_image(img_path)
+#     input_heatmap = overlay_heatmap(input_img, compute_gradcam(feature_extractor, input_array, layer_name=feature_layer_name))
+#     predicted_images = [(input_img, input_heatmap)] 
     
-    return predicted_images
+#     for person in predicted_people:
+#         img_path = get_image_from_train(person)
+#         if img_path:
+#             img_array, img = preprocess_image(img_path)
+#             person_heatmap = overlay_heatmap(img, compute_gradcam(feature_extractor, img_array, layer_name=feature_layer_name))
+            
+#             predicted_images.append((img, person_heatmap)) 
+    
+#     return predicted_images
+
+
+# def predict_label(img_path):
+#     distance_vector = compute_distance_vector(img_path)
+#     logreg_model, logreg_pca, logreg_scaler, knn_model, knn_pca, knn_scaler, mlp_model, mlp_scaler = load_classification_model()
+    
+#     knn_pred = knn_model.predict(knn_pca.transform(knn_scaler.transform(distance_vector)))[0]
+#     mlp_pred = np.argmax(mlp_model.predict(mlp_scaler.transform(distance_vector)), axis=1)[0]
+#     logreg_pred = logreg_model.predict(logreg_pca.transform(logreg_scaler.transform(distance_vector)))[0]
+    
+#     predictions = {"LogisticRegression": logreg_pred, "KNN": knn_pred, "MLP": mlp_pred}
+    
+#     # Tạo một mảng để chứa các hình ảnh
+#     predicted_images = []
+#     for method, pred in predictions.items():
+#         img_path = get_image_from_train(index_to_class.get(pred, "Unknown"))
+#         if img_path:
+#             img_array, img = preprocess_image(img_path)
+#             predicted_images.append(img)  # Thêm hình ảnh vào mảng
+
+#     return predicted_images

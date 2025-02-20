@@ -55,7 +55,7 @@ const Form = () => {
         </TouchableOpacity>
 
         <SelectDropdown
-          data={['kmeans_k=16', 'kmeans_k=32','gmm_k=16','gmm_k=32']}
+          data={['kmeans_k=16','gmm_k=16',]}
           onSelect={(selectedItem, index) => {
             setKmeansValue(selectedItem); 
           }}

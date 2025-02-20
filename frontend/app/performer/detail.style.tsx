@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    marginTop: 64,
+    marginTop: 12,
   },
   imageContainer: {
     alignItems: 'center',

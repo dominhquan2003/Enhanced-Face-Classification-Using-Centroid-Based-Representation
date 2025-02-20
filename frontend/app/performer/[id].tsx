@@ -110,6 +110,27 @@ const PerformerDetail = () => {
         </TouchableOpacity>
       </View>
 
+      <View style={styles.row}>
+        <TouchableOpacity onPress={() => openModal(performer.lg)}>
+          <View style={styles.imageContainer}>
+            <Image source={{ uri: performer.lg }} style={styles.imageSmall} />
+            <Text style={styles.label}>Logistic Regression</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => openModal(performer.knn)}>
+          <View style={styles.imageContainer}>
+            <Image source={{ uri: performer.knn }} style={styles.imageSmall} />
+            <Text style={styles.label}>KNN</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => openModal(performer.mlp)}>
+          <View style={styles.imageContainer}>
+            <Image source={{ uri: performer.mlp }} style={styles.imageSmall} />
+            <Text style={styles.label}>MLP</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+
    
       <Modal
         visible={modalVisible}
