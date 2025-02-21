@@ -1,0 +1,10 @@
+data/
+data-collection/actors/
+data-collection/actresses/
+data-collection/download.log
+dataset-filter/
+dataset-raw/
+distance_vectors/
+feature_maps/
+models/
+temp/

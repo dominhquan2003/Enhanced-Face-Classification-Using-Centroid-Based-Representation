@@ -1,4 +1,0 @@
-# Ignore the models folder in backendapi
-backendapi/models/
-
-backendapi/api/_pycache_/
